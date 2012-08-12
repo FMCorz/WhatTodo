@@ -80,7 +80,7 @@ class WhatTodoEvent(sublime_plugin.EventListener):
 			return
 		wt = WhatTodo(view)
 		if wt.canInSyntax():
-			wt.highlight()	
+			wt.highlight()
 
 	def on_modified(self, view):
 		if not s.get('auto_display'):
@@ -117,7 +117,7 @@ class WhatTodo(object):
 		fn = self.view.file_name() or 'Unsaved document'
 		v.insert(e, v.size(), '%s\n\n' % fn)
 		for (linenb, todo) in todos:
-			s = "{0:>5}:\t{1}\n".format(linenb, todo)
+			s = u"{0:>5}:\t{1}\n".format(linenb, todo)
 			v.insert(e, v.size(), s)
 		v.end_edit(e)
 
