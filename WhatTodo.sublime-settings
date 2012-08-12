@@ -1,0 +1,23 @@
+{
+	// Automatic display of TODOs
+	"auto_display": true,
+
+	// Auto display the TODOs in those syntaxes
+	// [ ] for none
+	// [ "*" ] for any
+	// [ "PHP", "Python" ] this should match the packages directory names
+	"limit_to_syntax": [ "*" ],
+
+	// Scope name to use for display
+	"scope_name": "string",
+
+	// Highlight as an outline, rather than filled in.
+	"draw_outlined": true,
+
+	// If true, the cursor is set on the next TODO
+	// If false, the view is centered on the TODO
+	"jump_with_cursor": true,
+
+	// The plugin will stop looking for TODOs when the document reaches this size
+	"threshold": 1048576
+}

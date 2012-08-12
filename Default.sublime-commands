@@ -1,0 +1,22 @@
+[
+    {
+        "caption": "What Todo: Highlight the TODOs",
+        "command": "what_todo_show",
+        "args": { }
+    },
+    {
+        "caption": "What Todo: Remove highlight",
+        "command": "what_todo_hide",
+        "args": { }
+    },
+    {
+        "caption": "What Todo: Jump to next",
+        "command": "what_todo_jump",
+        "args": { "backwards": false }
+    },
+    {
+        "caption": "What Todo: Export list",
+        "command": "what_todo_export",
+        "args": { }
+    }
+]
