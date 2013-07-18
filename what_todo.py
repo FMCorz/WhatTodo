@@ -3,7 +3,7 @@
 """
 What Todo
 
-Plugin for Sublime Text 2 to highlight, jump to and export your TODOs
+Plugin for Sublime Text to highlight, jump to and export your TODOs
 
 Copyright (c) 2012 Frédéric Massart - FMCorz.net
 
@@ -16,8 +16,6 @@ http://github.com/FMCorz/WhatTodo
 import re
 from os.path import split
 import sublime, sublime_plugin
-
-s = sublime.load_settings('WhatTodo.sublime-settings')
 
 class WhatTodoJumpCommand(sublime_plugin.TextCommand):
 
@@ -43,7 +41,7 @@ class WhatTodoShowCommand(sublime_plugin.TextCommand):
 		wt.highlight()
 
 	def is_enabled(self):
-		return not s.get('auto_display')
+		return not WhatTodo.s().get('auto_display')
 
 	def description(self):
 		return None
@@ -56,7 +54,7 @@ class WhatTodoHideCommand(sublime_plugin.TextCommand):
 
 	def is_enabled(self):
 		wt = WhatTodo(self.view)
-		return (not s.get('auto_display') and wt.hasHighlighted())
+		return (not wt.s().get('auto_display') and wt.hasHighlighted())
 
 	def description(self):
 		return None
@@ -73,17 +71,28 @@ class WhatTodoExportCommand(sublime_plugin.TextCommand):
 	def description(self):
 		return None
 
+class WhatTodoOutputExportCommand(sublime_plugin.TextCommand):
+
+	def run(self, edit, text):
+		self.view.insert(edit, 0, text)
+
+	def is_enabled(self):
+		return True
+
+	def description(self):
+		return None
+
 class WhatTodoEvent(sublime_plugin.EventListener):
 
 	def on_load(self, view):
-		if not s.get('auto_display'):
+		if not WhatTodo.s().get('auto_display'):
 			return
 		wt = WhatTodo(view)
 		if wt.canInSyntax():
 			wt.highlight()
 
 	def on_modified(self, view):
-		if not s.get('auto_display'):
+		if not WhatTodo.s().get('auto_display'):
 			return
 		wt = WhatTodo(view)
 		if wt.canInSyntax():
@@ -101,7 +110,7 @@ class WhatTodo(object):
 		"""Validates the syntax against the user's preferences"""
 		syntax = self.view.settings().get('syntax')
 		syntax = split(syntax)[0].replace('Packages/', '')
-		allowed = s.get('limit_to_syntax')
+		allowed = self.s().get('limit_to_syntax')
 		if '*' in allowed or syntax in allowed:
 			return True
 		return False
@@ -113,13 +122,14 @@ class WhatTodo(object):
 		todos = self.extract()
 		v = sublime.active_window().new_file()
 		v.set_name('TODO export')
-		e = v.begin_edit()
 		fn = self.view.file_name() or 'Unsaved document'
-		v.insert(e, v.size(), '%s\n\n' % fn)
+
+		s = '%s\n\n' % fn
 		for (linenb, todo) in todos:
-			s = u"{0:>5}:\t{1}\n".format(linenb, todo)
-			v.insert(e, v.size(), s)
-		v.end_edit(e)
+			s += u"{0:>5}:\t{1}\n".format(linenb, todo)
+
+		kwargs = { "text": s }
+		v.run_command('what_todo_output_export', kwargs)
 
 	def extract(self):
 		"""Extract the sanitized TODO along with its line number"""
@@ -139,8 +149,8 @@ class WhatTodo(object):
 		return len(self.get())
 
 	def hasHighlighted(self):
-		"""Return the number of regions"""
-		return len(self.view.get_regions('what_todo_highlight'))
+		"""Return if there are highlighted regions"""
+		return len(self.view.get_regions('what_todo_highlight')) > 0
 
 	def hide(self):
 		"""Hides the TODOs"""
@@ -155,7 +165,7 @@ class WhatTodo(object):
 	def _highlight(self):
 		"""Highlight the regions"""
 		regions = self.view.get_regions('what_todo')
-		self.view.add_regions('what_todo_highlight', regions, s.get('scope_name'), sublime.DRAW_OUTLINED if s.get('draw_outlined') else None)
+		self.view.add_regions('what_todo_highlight', regions, self.s().get('scope_name'), '', sublime.DRAW_OUTLINED if self.s().get('draw_outlined') else None)
 
 	def find(self):
 		"""Creates a find timeout"""
@@ -164,7 +174,7 @@ class WhatTodo(object):
 
 	def _find(self):
 		"""Find the regions"""
-		if self.view.size() > s.get('threshold'):
+		if self.view.size() > self.s().get('threshold'):
 			return
 
 		kept = []
@@ -197,7 +207,7 @@ class WhatTodo(object):
 		regions = self.get()
 
 		# Get the cursor position
-		if s.get('jump_with_cursor'):
+		if self.s().get('jump_with_cursor'):
 			wherearewe = self.view.sel()[0].begin()
 		# Get the point where we last jumped
 		else:
@@ -222,11 +232,15 @@ class WhatTodo(object):
 
 		self.view.settings().set('what_todo_jump', jumpto.begin())
 
-		if s.get('jump_with_cursor'):
+		if self.s().get('jump_with_cursor'):
 			self.view.sel().clear()
 			self.view.sel().add(jumpto.begin())
 
 		self.view.show_at_center(jumpto)
+
+	@staticmethod
+	def s():
+		return sublime.load_settings('WhatTodo.sublime-settings')
 
 	def shell_variables(self, pt):
 		"""Return the meta info shellVariables"""

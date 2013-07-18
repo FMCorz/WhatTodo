@@ -15,14 +15,21 @@ The following commands are accessible via the command palette:
 
 By default the TODOs are highlighted as you type. See the settings file for extra options.
 
+Requirements
+------------
+
+Sublime Text 2 or 3.
+
 Installation
 ------------
 
-Clone this repository into the Packages directory. If you don't know where it is, enter the following command in the console:
+Simply clone this repository into the Packages directory.
 
-    print sublime.packages_path()
+	Preferences > Browse Packages...
 
-_To access the console press CTRL + `_
+Alternatively, add the URL of this repository to the Package Control.
+
+	Command palette > Package Control: Add Repository
 
 License
 -------
