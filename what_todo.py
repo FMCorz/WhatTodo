@@ -165,7 +165,7 @@ class WhatTodo(object):
 	def _highlight(self):
 		"""Highlight the regions"""
 		regions = self.view.get_regions('what_todo')
-		self.view.add_regions('what_todo_highlight', regions, self.s().get('scope_name'), '', sublime.DRAW_OUTLINED if self.s().get('draw_outlined') else None)
+		self.view.add_regions('what_todo_highlight', regions, self.s().get('scope_name'), '', sublime.DRAW_OUTLINED if self.s().get('draw_outlined') else 0)
 
 	def find(self):
 		"""Creates a find timeout"""
